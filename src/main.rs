@@ -23,10 +23,10 @@ fn main() {
         current_char: None,
     };
 
-    while let Some(char) = lex.peek() {
-        println!("{}", char);
-        lex.next_char();
-    }
+    // while let Some(char) = lex.peek() {
+    //     println!("{}", char);
+    //     lex.next_char();
+    // }
 }
 
 struct Lexer {
@@ -46,29 +46,49 @@ impl Lexer {
     }
 
     fn get_token(&mut self) -> Option<Token> {
-        let token = None;
+        self.skip_whitespace();
 
         if let Some(char) = self.current_char {
-            token = match char {
-                '+' => Token(self.current_char, TokenType::PLUS),
-                '-' => Token(self.current_char, TokenType::MINUS),
-                '/' => Token(self.current_char, TokenType::SLASH),
-                '*' => Token(self.current_char, TokenType::ASTERISK),
-                '\0' => Token(None, TokenType::EOF),
-                '\n' => Token(self.current_char, TokenType::NEWLINE),
+            let token = match char {
+                '+' => Token::new(self.current_char, TokenType::PLUS),
+                '-' => Token::new(self.current_char, TokenType::MINUS),
+                '/' => Token::new(self.current_char, TokenType::SLASH),
+                '*' => Token::new(self.current_char, TokenType::ASTERISK),
+                '\0' => Token::new(None, TokenType::EOF),
+                '\n' => Token::new(self.current_char, TokenType::NEWLINE),
                 _ => return None,
-            }
-        } else {
-            None
-        }
+            };
 
-        self.next_char();
-        Some(token)
+            self.next_char();
+            Some(token)
+        } else {
+            self.next_char();
+            return None;
+        }
+    }
+
+    fn skip_whitespace(&mut self) {
+        if let Some(char) = self.current_char {
+            match char {
+                ' ' | '\t' | '\r' => self.next_char(),
+                _ => return,
+            }
+        }
+    }
 }
 
 struct Token {
     token_text: Option<char>,
     token_type: TokenType,
+}
+
+impl Token {
+    fn new(token_text: Option<char>, token_type: TokenType) -> Self {
+        Token {
+            token_text,
+            token_type,
+        }
+    }
 }
 
 enum TokenType {
