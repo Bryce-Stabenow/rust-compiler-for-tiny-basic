@@ -1,7 +1,4 @@
-use std::{
-    fs::read_to_string,
-    io::{self},
-};
+use std::{char, fs::read_to_string, io};
 
 fn main() {
     println!("Enter path of Tiny-BASIC file to compile:");
@@ -47,6 +44,63 @@ impl Lexer {
     fn peek(&self) -> Option<char> {
         self.data.chars().nth((self.current_pos + 1) as usize)
     }
+
+    fn get_token(&mut self) -> Option<Token> {
+        let token = None;
+
+        if let Some(char) = self.current_char {
+            token = match char {
+                '+' => Token(self.current_char, TokenType::PLUS),
+                '-' => Token(self.current_char, TokenType::MINUS),
+                '/' => Token(self.current_char, TokenType::SLASH),
+                '*' => Token(self.current_char, TokenType::ASTERISK),
+                '\0' => Token(None, TokenType::EOF),
+                '\n' => Token(self.current_char, TokenType::NEWLINE),
+                _ => return None,
+            }
+        } else {
+            None
+        }
+
+        self.next_char();
+        Some(token)
+}
+
+struct Token {
+    token_text: Option<char>,
+    token_type: TokenType,
+}
+
+enum TokenType {
+    EOF,
+    NEWLINE,
+    NUMBER,
+    IDENT,
+    STRING,
+    //Keywords
+    LABEL,
+    GOTO,
+    PRINT,
+    INPUT,
+    LET,
+    IF,
+    THEN,
+    ENDIF,
+    WHILE,
+    REPEAT,
+    ENDWHILE,
+    //Operators
+    EQ,
+    PLUS,
+    MINUS,
+    ASTERISK,
+    SLASH,
+    EQEQ,
+    NOTEQ,
+    LT,
+    LTEQ,
+    GT,
+    GTEQ,
 }
 
 // struct Parser {}
