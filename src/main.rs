@@ -17,16 +17,30 @@ fn main() {
 
     file += "\n"; // Adding newline for clarity parsing end of file
 
-    let mut lex: Lexer = Lexer {
-        data: file,
-        current_pos: -1,
-        current_char: None,
-    };
+    // let mut lex: Lexer = Lexer {
+    //     data: file,
+    //     current_pos: -1,
+    //     current_char: None,
+    // };
 
     // while let Some(char) = lex.peek() {
     //     println!("{}", char);
     //     lex.next_char();
     // }
+
+    let mut lex2: Lexer = Lexer {
+        data: String::from("+- */"),
+        current_pos: -1,
+        current_char: None,
+    };
+
+    lex2.get_token();
+    while let Some(token) = lex2.get_token() {
+        if token.token_type == TokenType::EOF {
+            break;
+        }
+        println!("{:?}", token.token_type)
+    }
 }
 
 struct Lexer {
@@ -91,6 +105,7 @@ impl Token {
     }
 }
 
+#[derive(PartialEq, Debug)]
 enum TokenType {
     EOF,
     NEWLINE,
