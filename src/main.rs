@@ -23,11 +23,6 @@ fn main() {
         current_char: None,
     };
 
-    // while let Some(char) = lex.peek() {
-    //     println!("{}", char);
-    //     lex.next_char();
-    // }
-
     lex.get_token();
     while let Some(token) = lex.get_token() {
         if token.token_type == TokenType::EOF {
@@ -36,7 +31,7 @@ fn main() {
 
         println!("{:?}", token.token_type);
 
-        if token.token_type == TokenType::STRING {
+        if token.token_type == TokenType::STRING || token.token_type == TokenType::NUMBER {
             println!("{}", token.token_text.unwrap())
         }
     }
@@ -63,48 +58,54 @@ impl Lexer {
         self.skip_comment();
 
         if let Some(char) = self.current_char {
-            let token = match char {
-                '+' => Token::new(Some(self.current_char?.to_string()), TokenType::PLUS), // Could unwrap current_char, but this is easier
-                '-' => Token::new(Some(self.current_char?.to_string()), TokenType::MINUS),
-                '/' => Token::new(Some(self.current_char?.to_string()), TokenType::SLASH),
-                '*' => Token::new(Some(self.current_char?.to_string()), TokenType::ASTERISK),
-                '=' => {
-                    if self.peek() == Some('=') {
-                        self.next_char();
-                        Token::new(None, TokenType::EQEQ)
-                    } else {
-                        Token::new(Some(self.current_char?.to_string()), TokenType::EQ)
+            let token: Token;
+
+            if char.is_digit(10) {
+                token = Token::new(Some(self.get_number()), TokenType::NUMBER);
+            } else {
+                token = match char {
+                    '+' => Token::new(Some(self.current_char?.to_string()), TokenType::PLUS), // Could unwrap current_char, but this is easier
+                    '-' => Token::new(Some(self.current_char?.to_string()), TokenType::MINUS),
+                    '/' => Token::new(Some(self.current_char?.to_string()), TokenType::SLASH),
+                    '*' => Token::new(Some(self.current_char?.to_string()), TokenType::ASTERISK),
+                    '=' => {
+                        if self.peek() == Some('=') {
+                            self.next_char();
+                            Token::new(None, TokenType::EQEQ)
+                        } else {
+                            Token::new(Some(self.current_char?.to_string()), TokenType::EQ)
+                        }
                     }
-                }
-                '>' => {
-                    if self.peek() == Some('=') {
-                        self.next_char();
-                        Token::new(Some(">=".to_string()), TokenType::GTEQ)
-                    } else {
-                        Token::new(Some(self.current_char?.to_string()), TokenType::GT)
+                    '>' => {
+                        if self.peek() == Some('=') {
+                            self.next_char();
+                            Token::new(Some(">=".to_string()), TokenType::GTEQ)
+                        } else {
+                            Token::new(Some(self.current_char?.to_string()), TokenType::GT)
+                        }
                     }
-                }
-                '!' => {
-                    if self.peek() == Some('=') {
-                        self.next_char();
-                        Token::new(Some("!=".to_string()), TokenType::NOTEQ)
-                    } else {
-                        panic!("Expected !=, got ! Char: {}", self.current_pos);
+                    '!' => {
+                        if self.peek() == Some('=') {
+                            self.next_char();
+                            Token::new(Some("!=".to_string()), TokenType::NOTEQ)
+                        } else {
+                            panic!("Expected !=, got ! Char: {}", self.current_pos);
+                        }
                     }
-                }
-                '<' => {
-                    if self.peek() == Some('=') {
-                        self.next_char();
-                        Token::new(Some("<=".to_string()), TokenType::LTEQ)
-                    } else {
-                        Token::new(Some(self.current_char?.to_string()), TokenType::LT)
+                    '<' => {
+                        if self.peek() == Some('=') {
+                            self.next_char();
+                            Token::new(Some("<=".to_string()), TokenType::LTEQ)
+                        } else {
+                            Token::new(Some(self.current_char?.to_string()), TokenType::LT)
+                        }
                     }
-                }
-                '"' => Token::new(Some(self.get_string()), TokenType::STRING),
-                '\0' => Token::new(None, TokenType::EOF),
-                '\n' => Token::new(Some(self.current_char?.to_string()), TokenType::NEWLINE),
-                _ => return None,
-            };
+                    '"' => Token::new(Some(self.get_string()), TokenType::STRING),
+                    '\0' => Token::new(None, TokenType::EOF),
+                    '\n' => Token::new(Some(self.current_char?.to_string()), TokenType::NEWLINE),
+                    _ => return None,
+                };
+            }
 
             self.next_char();
             Some(token)
@@ -154,6 +155,22 @@ impl Lexer {
         }
 
         string_val
+    }
+
+    fn get_number(&mut self) -> String {
+        let mut num_val = String::new();
+
+        while let Some(char) = self.current_char {
+            match char.is_digit(10) || char == '.' {
+                true => {
+                    num_val.push(char);
+                    self.next_char();
+                }
+                false => break,
+            }
+        }
+
+        num_val
     }
 }
 
