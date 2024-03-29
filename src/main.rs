@@ -29,7 +29,7 @@ fn main() {
     // }
 
     let mut lex2: Lexer = Lexer {
-        data: String::from("+- */"),
+        data: String::from("+- */ >>= = !=\n"),
         current_pos: -1,
         current_char: None,
     };
@@ -68,6 +68,38 @@ impl Lexer {
                 '-' => Token::new(self.current_char, TokenType::MINUS),
                 '/' => Token::new(self.current_char, TokenType::SLASH),
                 '*' => Token::new(self.current_char, TokenType::ASTERISK),
+                '=' => {
+                    if self.peek() == Some('=') {
+                        self.next_char();
+                        Token::new(None, TokenType::EQEQ)
+                    } else {
+                        Token::new(self.current_char, TokenType::EQ)
+                    }
+                }
+                '>' => {
+                    if self.peek() == Some('=') {
+                        self.next_char();
+                        Token::new(None, TokenType::GTEQ)
+                    } else {
+                        Token::new(self.current_char, TokenType::GT)
+                    }
+                }
+                '!' => {
+                    if self.peek() == Some('=') {
+                        self.next_char();
+                        Token::new(None, TokenType::NOTEQ)
+                    } else {
+                        panic!("Expected !=, got ! Char: {}", self.current_pos);
+                    }
+                }
+                '<' => {
+                    if self.peek() == Some('=') {
+                        self.next_char();
+                        Token::new(None, TokenType::LTEQ)
+                    } else {
+                        Token::new(self.current_char, TokenType::LT)
+                    }
+                }
                 '\0' => Token::new(None, TokenType::EOF),
                 '\n' => Token::new(self.current_char, TokenType::NEWLINE),
                 _ => return None,
