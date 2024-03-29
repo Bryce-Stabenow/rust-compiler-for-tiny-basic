@@ -17,29 +17,28 @@ fn main() {
 
     file += "\n"; // Adding newline for clarity parsing end of file
 
-    // let mut lex: Lexer = Lexer {
-    //     data: file,
-    //     current_pos: -1,
-    //     current_char: None,
-    // };
+    let mut lex: Lexer = Lexer {
+        data: file,
+        current_pos: -1,
+        current_char: None,
+    };
 
     // while let Some(char) = lex.peek() {
     //     println!("{}", char);
     //     lex.next_char();
     // }
 
-    let mut lex2: Lexer = Lexer {
-        data: String::from("+- */ >>= = !=\n"),
-        current_pos: -1,
-        current_char: None,
-    };
-
-    lex2.get_token();
-    while let Some(token) = lex2.get_token() {
+    lex.get_token();
+    while let Some(token) = lex.get_token() {
         if token.token_type == TokenType::EOF {
             break;
         }
-        println!("{:?}", token.token_type)
+
+        println!("{:?}", token.token_type);
+
+        if token.token_type == TokenType::STRING {
+            println!("{}", token.token_text.unwrap())
+        }
     }
 }
 
@@ -61,33 +60,34 @@ impl Lexer {
 
     fn get_token(&mut self) -> Option<Token> {
         self.skip_whitespace();
+        self.skip_comment();
 
         if let Some(char) = self.current_char {
             let token = match char {
-                '+' => Token::new(self.current_char, TokenType::PLUS),
-                '-' => Token::new(self.current_char, TokenType::MINUS),
-                '/' => Token::new(self.current_char, TokenType::SLASH),
-                '*' => Token::new(self.current_char, TokenType::ASTERISK),
+                '+' => Token::new(Some(self.current_char?.to_string()), TokenType::PLUS), // Could unwrap current_char, but this is easier
+                '-' => Token::new(Some(self.current_char?.to_string()), TokenType::MINUS),
+                '/' => Token::new(Some(self.current_char?.to_string()), TokenType::SLASH),
+                '*' => Token::new(Some(self.current_char?.to_string()), TokenType::ASTERISK),
                 '=' => {
                     if self.peek() == Some('=') {
                         self.next_char();
                         Token::new(None, TokenType::EQEQ)
                     } else {
-                        Token::new(self.current_char, TokenType::EQ)
+                        Token::new(Some(self.current_char?.to_string()), TokenType::EQ)
                     }
                 }
                 '>' => {
                     if self.peek() == Some('=') {
                         self.next_char();
-                        Token::new(None, TokenType::GTEQ)
+                        Token::new(Some(">=".to_string()), TokenType::GTEQ)
                     } else {
-                        Token::new(self.current_char, TokenType::GT)
+                        Token::new(Some(self.current_char?.to_string()), TokenType::GT)
                     }
                 }
                 '!' => {
                     if self.peek() == Some('=') {
                         self.next_char();
-                        Token::new(None, TokenType::NOTEQ)
+                        Token::new(Some("!=".to_string()), TokenType::NOTEQ)
                     } else {
                         panic!("Expected !=, got ! Char: {}", self.current_pos);
                     }
@@ -95,13 +95,14 @@ impl Lexer {
                 '<' => {
                     if self.peek() == Some('=') {
                         self.next_char();
-                        Token::new(None, TokenType::LTEQ)
+                        Token::new(Some("<=".to_string()), TokenType::LTEQ)
                     } else {
-                        Token::new(self.current_char, TokenType::LT)
+                        Token::new(Some(self.current_char?.to_string()), TokenType::LT)
                     }
                 }
+                '"' => Token::new(Some(self.get_string()), TokenType::STRING),
                 '\0' => Token::new(None, TokenType::EOF),
-                '\n' => Token::new(self.current_char, TokenType::NEWLINE),
+                '\n' => Token::new(Some(self.current_char?.to_string()), TokenType::NEWLINE),
                 _ => return None,
             };
 
@@ -121,15 +122,48 @@ impl Lexer {
             }
         }
     }
+
+    fn skip_comment(&mut self) {
+        let char = self.current_char.unwrap_or('\0');
+
+        if char == '#' {
+            while let Some(char) = self.current_char {
+                match char {
+                    '\n' => break,
+                    _ => self.next_char(),
+                }
+            }
+        }
+    }
+
+    fn get_string(&mut self) -> String {
+        self.next_char(); // Move cursor to first line of string instead of " char
+        let mut string_val = String::new();
+
+        while let Some(char) = self.current_char {
+            match char {
+                '\n' | '\r' | '%' | '\t' | '\\' => {
+                    panic!("Unexpected character in string: {}", char); // Don't allow escape characters, newlines, tabs, or %
+                }
+                '"' => break,
+                _ => {
+                    string_val.push(char);
+                    self.next_char();
+                }
+            }
+        }
+
+        string_val
+    }
 }
 
 struct Token {
-    token_text: Option<char>,
+    token_text: Option<String>,
     token_type: TokenType,
 }
 
 impl Token {
-    fn new(token_text: Option<char>, token_type: TokenType) -> Self {
+    fn new(token_text: Option<String>, token_type: TokenType) -> Self {
         Token {
             token_text,
             token_type,
