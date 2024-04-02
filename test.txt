@@ -1,7 +1,7 @@
-#+- */ > >= = !=
-#this is a comment
-#"This is a string"
-#2.14 123456
-#==
++- */ > >= = !=
+this is a comment
+"This is a string"
+2.14 123456
+==
 
 IF+-123 foo*THEN/
