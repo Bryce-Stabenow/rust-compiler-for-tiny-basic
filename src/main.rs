@@ -62,6 +62,8 @@ impl Lexer {
 
             if char.is_digit(10) {
                 token = Token::new(Some(self.get_number()), TokenType::NUMBER);
+            } else if char.is_alphabetic() {
+                token = self.get_keyword_token();
             } else {
                 token = match char {
                     '+' => Token::new(Some(self.current_char?.to_string()), TokenType::PLUS), // Could unwrap current_char, but this is easier
@@ -172,6 +174,25 @@ impl Lexer {
 
         num_val
     }
+
+    fn get_keyword_token(&mut self) -> Token {
+        let mut word = String::new();
+
+        while let Some(char) = self.peek() {
+            word.push(self.current_char.expect("ERROR: Unable to parse keyword"));
+
+            match char.is_alphabetic() {
+                true => {
+                    self.next_char();
+                }
+                false => {
+                    break;
+                }
+            }
+        }
+
+        TokenType::from_string(word)
+    }
 }
 
 struct Token {
@@ -219,6 +240,27 @@ enum TokenType {
     LTEQ,
     GT,
     GTEQ,
+}
+
+impl TokenType {
+    fn from_string(input: String) -> Token {
+        let token_type = match &input.to_lowercase()[..] {
+            "label" => TokenType::LABEL,
+            "goto" => TokenType::GOTO,
+            "print" => TokenType::PRINT,
+            "input" => TokenType::INPUT,
+            "let" => TokenType::LET,
+            "if" => TokenType::IF,
+            "then" => TokenType::THEN,
+            "endif" => TokenType::ENDIF,
+            "while" => TokenType::WHILE,
+            "repeat" => TokenType::REPEAT,
+            "endwhile" => TokenType::ENDWHILE,
+            _ => TokenType::IDENT,
+        };
+
+        Token::new(Some(input), token_type)
+    }
 }
 
 // struct Parser {}
