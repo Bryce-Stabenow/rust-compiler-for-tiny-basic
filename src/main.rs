@@ -1,6 +1,8 @@
 mod lex;
+mod parser;
 
-use crate::lex::{Lexer, TokenType};
+use crate::lex::Lexer;
+use crate::parser::Parser;
 use std::{fs::read_to_string, io};
 
 fn main() {
@@ -20,38 +22,32 @@ fn main() {
 
     file += "\n"; // Adding newline for clarity parsing end of file
 
+    // Initialize Lexer and Parser
     let mut lex: Lexer = Lexer {
         data: file,
         current_pos: -1,
         current_char: None,
     };
 
-    // let mut parser = Parser { lex };
+    let mut parser = Parser { lex };
 
-    // parser.program();
+    // Being parsing
+    parser.program();
 
-    // println!("Parsing complete");
+    println!("Parsing complete");
 
-    lex.get_token();
-    while let Some(token) = lex.get_token() {
-        if token.token_type == TokenType::EOF {
-            break;
-        }
+    // lex.get_token();
+    // while let Some(token) = lex.get_token() {
+    //     if token.token_type == TokenType::EOF {
+    //         break;
+    //     }
 
-        println!("{:?}", token.token_type);
+    //     println!("{:?}", token.token_type);
 
-        if token.token_type == TokenType::STRING || token.token_type == TokenType::NUMBER {
-            println!("{}", token.token_text.unwrap())
-        }
-    }
+    //     if token.token_type == TokenType::STRING || token.token_type == TokenType::NUMBER {
+    //         println!("{}", token.token_text.unwrap())
+    //     }
+    // }
 }
-
-// struct Parser {
-//     lex: Lexer,
-// }
-
-// impl Parser {
-//     fn program() {}
-// }
 
 // struct Emitter {}
