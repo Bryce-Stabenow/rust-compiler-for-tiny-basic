@@ -4,6 +4,7 @@ pub struct Lexer {
     pub current_char: Option<char>,
 }
 
+#[allow(dead_code)]
 impl Lexer {
     pub fn next_char(&mut self) {
         self.current_pos += 1;
@@ -156,6 +157,7 @@ impl Lexer {
     }
 }
 
+#[derive(Clone)]
 pub struct Token {
     pub token_text: Option<String>,
     pub token_type: TokenType,
@@ -221,5 +223,39 @@ impl TokenType {
         };
 
         Token::new(Some(input), token_type)
+    }
+}
+
+impl Clone for TokenType {
+    fn clone(&self) -> Self {
+        match self {
+            Self::EOF => Self::EOF,
+            Self::NEWLINE => Self::NEWLINE,
+            Self::NUMBER => Self::NUMBER,
+            Self::IDENT => Self::IDENT,
+            Self::STRING => Self::STRING,
+            Self::LABEL => Self::LABEL,
+            Self::GOTO => Self::GOTO,
+            Self::PRINT => Self::PRINT,
+            Self::INPUT => Self::INPUT,
+            Self::LET => Self::LET,
+            Self::IF => Self::IF,
+            Self::THEN => Self::THEN,
+            Self::ENDIF => Self::ENDIF,
+            Self::WHILE => Self::WHILE,
+            Self::REPEAT => Self::REPEAT,
+            Self::ENDWHILE => Self::ENDWHILE,
+            Self::EQ => Self::EQ,
+            Self::PLUS => Self::PLUS,
+            Self::MINUS => Self::MINUS,
+            Self::ASTERISK => Self::ASTERISK,
+            Self::SLASH => Self::SLASH,
+            Self::EQEQ => Self::EQEQ,
+            Self::NOTEQ => Self::NOTEQ,
+            Self::LT => Self::LT,
+            Self::LTEQ => Self::LTEQ,
+            Self::GT => Self::GT,
+            Self::GTEQ => Self::GTEQ,
+        }
     }
 }

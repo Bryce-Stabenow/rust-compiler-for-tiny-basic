@@ -23,13 +23,13 @@ fn main() {
     file += "\n"; // Adding newline for clarity parsing end of file
 
     // Initialize Lexer and Parser
-    let mut lex: Lexer = Lexer {
+    let lex: Lexer = Lexer {
         data: file,
         current_pos: -1,
         current_char: None,
     };
 
-    let mut parser = Parser { lex };
+    let parser = Parser::new(lex);
 
     // Being parsing
     parser.program();
