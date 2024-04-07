@@ -1,3 +1,5 @@
+use std::process::abort;
+
 use crate::lex::{Lexer, Token, TokenType};
 
 pub struct Parser {
@@ -43,7 +45,63 @@ impl Parser {
                     self.expression();
                 }
             }
-            _ => panic!("Unexpected expression"),
+            TokenType::IF => {
+                println!("STATEMENT-IF");
+                self.next_token();
+                // self.comparison();
+
+                self.match_token(TokenType::THEN);
+                self.nl();
+
+                while self.check_token(TokenType::ENDIF) == false {
+                    self.statement();
+                }
+
+                self.match_token(TokenType::ENDIF);
+            }
+            TokenType::WHILE => {
+                println!("STATEMENT-WHILE");
+                self.next_token();
+                // self.comparison();
+
+                self.match_token(TokenType::REPEAT);
+                self.nl();
+
+                while self.check_token(TokenType::ENDWHILE) == false {
+                    self.statement();
+                }
+
+                self.match_token(TokenType::ENDWHILE);
+            }
+            TokenType::LABEL => {
+                println!("STATEMENT-LABEL");
+                self.next_token();
+                self.match_token(TokenType::IDENT);
+            }
+            TokenType::GOTO => {
+                println!("STATEMENT-GOTO");
+                self.next_token();
+                self.match_token(TokenType::IDENT);
+            }
+            TokenType::LET => {
+                println!("STATEMENT-LET");
+                self.next_token();
+                self.match_token(TokenType::IDENT);
+                self.match_token(TokenType::EQ);
+                self.expression();
+            }
+            TokenType::INPUT => {
+                println!("STATEMENT-INPUT");
+                self.next_token();
+                self.match_token(TokenType::IDENT);
+            }
+            _ => {
+                println!(
+                    "Unexpected expression at {:?}",
+                    self.current_token.as_ref().unwrap().token_text
+                );
+                abort();
+            }
         }
 
         self.nl()
@@ -72,11 +130,12 @@ impl Parser {
     fn match_token(&mut self, kind: TokenType) {
         let kind_ref = kind.clone();
         if self.check_token(kind) == false {
-            panic!(
+            println!(
                 "Expected token: {:?}, Got token: {:?}",
                 kind_ref,
                 self.current_token.as_ref().unwrap().token_type
             );
+            abort();
         }
 
         self.next_token()
@@ -85,5 +144,9 @@ impl Parser {
     fn next_token(&mut self) {
         self.current_token = self.peek_token.clone();
         self.peek_token = self.lex.get_token();
+
+        // if let Some(_) = self.current_token.as_ref() {
+        //     println!("{:?}", self.current_token.as_ref().unwrap().token_text);
+        // }
     }
 }
