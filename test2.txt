@@ -1,2 +1,0 @@
-LET foo = 1
-PRINT foo + 1
