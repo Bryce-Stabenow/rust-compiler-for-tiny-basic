@@ -157,7 +157,7 @@ impl Lexer {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Token {
     pub token_text: Option<String>,
     pub token_type: TokenType,

@@ -20,7 +20,7 @@ fn main() {
         Err(_) => panic!("Unable to locate file: {}", user_file_path),
     };
 
-    file += "\n"; // Adding newline for clarity parsing end of file
+    file += "\n\0"; // Adding newline for clarity parsing end of file
 
     // Initialize Lexer and Parser
     let lex: Lexer = Lexer {
@@ -29,25 +29,12 @@ fn main() {
         current_char: None,
     };
 
-    let parser = Parser::new(lex);
+    let mut parser = Parser::new(lex);
 
     // Being parsing
     parser.program();
 
     println!("Parsing complete");
-
-    // lex.get_token();
-    // while let Some(token) = lex.get_token() {
-    //     if token.token_type == TokenType::EOF {
-    //         break;
-    //     }
-
-    //     println!("{:?}", token.token_type);
-
-    //     if token.token_type == TokenType::STRING || token.token_type == TokenType::NUMBER {
-    //         println!("{}", token.token_text.unwrap())
-    //     }
-    // }
 }
 
 // struct Emitter {}
