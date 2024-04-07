@@ -3,21 +3,18 @@ mod parser;
 
 use crate::lex::Lexer;
 use crate::parser::Parser;
-use std::{fs::read_to_string, io};
+use std::fs::read_to_string;
 
 fn main() {
-    println!("Enter path of Tiny-BASIC file to compile:");
-
-    let mut user_file_path = String::new();
-
-    io::stdin()
-        .read_line(&mut user_file_path)
-        .expect("Error: unable to read input");
+    let args: Vec<String> = std::env::args().collect();
+    if args.len() > 2 {
+        panic!("Usage: [file_path]");
+    }
 
     // Trim newline from input
-    let mut file = match read_to_string(&user_file_path.trim_end()) {
+    let mut file = match read_to_string(&args[1].trim_end()) {
         Ok(f) => f,
-        Err(_) => panic!("Unable to locate file: {}", user_file_path),
+        Err(_) => panic!("Unable to read file: {}", args[1]),
     };
 
     file += "\n\0"; // Adding newline for clarity parsing end of file
