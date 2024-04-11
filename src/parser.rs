@@ -28,6 +28,10 @@ impl Parser {
     pub fn program(&mut self) {
         println!("PROGRAM");
 
+        while self.check_token(TokenType::NEWLINE) {
+            self.next_token();
+        }
+
         while self.check_token(TokenType::EOF) == false {
             self.statement();
         }
@@ -48,7 +52,7 @@ impl Parser {
             TokenType::IF => {
                 println!("STATEMENT-IF");
                 self.next_token();
-                // self.comparison();
+                self.comparison();
 
                 self.match_token(TokenType::THEN);
                 self.nl();
@@ -62,7 +66,7 @@ impl Parser {
             TokenType::WHILE => {
                 println!("STATEMENT-WHILE");
                 self.next_token();
-                // self.comparison();
+                self.comparison();
 
                 self.match_token(TokenType::REPEAT);
                 self.nl();
@@ -98,7 +102,12 @@ impl Parser {
             _ => {
                 println!(
                     "Unexpected expression at {:?}",
-                    self.current_token.as_ref().unwrap().token_text
+                    self.current_token
+                        .as_ref()
+                        .unwrap()
+                        .token_text
+                        .as_ref()
+                        .unwrap()
                 );
                 abort();
             }
@@ -117,7 +126,90 @@ impl Parser {
         }
     }
 
-    fn expression(&mut self) {}
+    fn comparison(&mut self) {
+        println!("COMPARISON");
+
+        self.expression();
+
+        if self.is_comparison_operator() {
+            self.next_token();
+            self.expression();
+        } else {
+            println!(
+                "Expected comparison operator at {:?}",
+                self.current_token.as_ref().unwrap()
+            );
+            abort();
+        }
+
+        while self.is_comparison_operator() {
+            self.next_token();
+            self.expression();
+        }
+    }
+
+    fn is_comparison_operator(&self) -> bool {
+        self.check_token(TokenType::GT)
+            || self.check_token(TokenType::LT)
+            || self.check_token(TokenType::GTEQ)
+            || self.check_token(TokenType::LTEQ)
+            || self.check_token(TokenType::EQEQ)
+            || self.check_token(TokenType::NOTEQ)
+    }
+
+    fn expression(&mut self) {
+        println!("EXPRESSION");
+
+        self.term();
+
+        while self.check_token(TokenType::PLUS) || self.check_token(TokenType::MINUS) {
+            self.next_token();
+            self.term();
+        }
+    }
+
+    fn term(&mut self) {
+        println!("TERM");
+
+        self.urnary();
+
+        while self.check_token(TokenType::ASTERISK) || self.check_token(TokenType::SLASH) {
+            self.next_token();
+            self.urnary();
+        }
+    }
+
+    fn urnary(&mut self) {
+        println!("UNARY");
+
+        if self.check_token(TokenType::PLUS) || self.check_token(TokenType::MINUS) {
+            self.next_token();
+        }
+
+        self.primary();
+    }
+
+    fn primary(&mut self) {
+        println!(
+            "PRIMARY: {:?}",
+            self.current_token
+                .as_ref()
+                .unwrap()
+                .token_text
+                .as_ref()
+                .unwrap()
+        );
+
+        if self.check_token(TokenType::IDENT) || self.check_token(TokenType::NUMBER) {
+            self.next_token();
+        } else {
+            println!(
+                "Unexpected primary token: {:?}",
+                self.current_token.as_ref().unwrap().token_text
+            );
+            abort();
+        }
+    }
 
     fn check_token(&self, kind: TokenType) -> bool {
         kind == self.current_token.as_ref().unwrap().token_type
