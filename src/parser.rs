@@ -236,13 +236,10 @@ impl Parser {
     }
 
     fn next_token(&mut self) {
-        // if let Some(_) = self.current_token.as_ref() {
-        //     println!("{:?}", self.current_token.as_ref());
-        // }
-
         self.current_token = self.peek_token.clone();
         self.peek_token = self.lex.get_token();
 
+        // DEBUGGING SECTION
         // if let Some(_) = self.current_token.as_ref() {
         //     println!("Current: {:?}", self.current_token.as_ref());
         //     println!("Peek: {:?}\n", self.peek_token.as_ref());

@@ -1,4 +1,4 @@
-LET foo = bar + 2
-IF  foo > bar THEN
+LET foo = bar * 3 + 2
+IF foo > bar THEN
     PRINT "wow"
 ENDIF

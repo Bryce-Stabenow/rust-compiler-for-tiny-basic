@@ -9,8 +9,6 @@ impl Lexer {
     pub fn next_char(&mut self) {
         self.current_pos += 1;
         self.current_char = self.data.chars().nth(self.current_pos as usize);
-
-        // println!("{:?}", self.current_char);
     }
 
     pub fn peek(&self) -> Option<char> {
@@ -82,7 +80,7 @@ impl Lexer {
     }
 
     fn skip_whitespace(&mut self) {
-        if let Some(char) = self.current_char {
+        while let Some(char) = self.current_char {
             match char {
                 ' ' | '\t' | '\r' => self.next_char(),
                 _ => return,
@@ -124,19 +122,13 @@ impl Lexer {
     }
 
     fn get_number(&mut self) -> String {
-        // TODO Use peek here so that we don't skip the new line if numnber or string ends the line
         let mut num_val = String::new();
 
-        while let Some(char) = self.current_char {
-            println!("{:?}", self.current_char);
-
-            if char == '\n' {
-                break;
-            }
+        while let Some(char) = self.peek() {
+            num_val.push(self.current_char.expect("ERROR: Unable to parse number"));
 
             match char.is_digit(10) || char == '.' {
                 true => {
-                    num_val.push(char);
                     self.next_char();
                 }
                 false => break,
