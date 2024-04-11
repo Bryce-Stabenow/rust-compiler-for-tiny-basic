@@ -237,8 +237,8 @@ impl Parser {
         self.current_token = self.peek_token.clone();
         self.peek_token = self.lex.get_token();
 
-        // if let Some(_) = self.current_token.as_ref() {
-        //     println!("{:?}", self.current_token.as_ref().unwrap().token_text);
-        // }
+        if let Some(_) = self.current_token.as_ref() {
+            println!("{:?}", self.current_token.as_ref());
+        }
     }
 }

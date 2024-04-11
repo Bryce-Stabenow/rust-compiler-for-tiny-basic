@@ -17,7 +17,7 @@ fn main() {
         Err(_) => panic!("Unable to read file: {}", args[1]),
     };
 
-    file += "\n\n\0"; // Adding newline and EOF for clarity parsing
+    file += "\n\0"; // Adding newline and EOF for clarity parsing
 
     // Initialize Lexer and Parser
     let lex: Lexer = Lexer {
