@@ -109,7 +109,11 @@ impl Parser {
                         .as_ref()
                         .unwrap()
                 );
+                #[cfg(not(test))]
                 abort();
+
+                #[cfg(test)] // Panic here during testing
+                panic!();
             }
         }
 

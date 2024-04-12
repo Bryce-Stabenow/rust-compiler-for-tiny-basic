@@ -40,17 +40,27 @@ fn parse(file_name: &str) {
 
 // struct Emitter {}
 
-#[test]
-fn it_handles_all_test_files() {
-    let test_files: Vec<&str> = vec![
-        "expression.teeny",
-        "hello.teeny",
-        "loop.teeny",
-        "nested-loop.teeny",
-        "test.txt",
-    ];
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-    for file in test_files {
-        parse(file);
+    #[test]
+    fn it_handles_all_test_files() {
+        let test_files: Vec<&str> = vec![
+            "expression.teeny",
+            "hello.teeny",
+            "loop.teeny",
+            "nested-loop.teeny",
+        ];
+
+        for file in test_files {
+            parse(file);
+        }
+    }
+
+    #[test]
+    #[should_panic]
+    fn it_breaks_on_incorrect_tests() {
+        parse("test.txt");
     }
 }
