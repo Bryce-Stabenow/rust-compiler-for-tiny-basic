@@ -15,15 +15,11 @@ fn main() {
 }
 
 fn parse(file_name: &str) {
-    print!("0");
-
     // Trim newline from input
     let mut file = match read_to_string(file_name) {
         Ok(f) => f,
         Err(_) => panic!("Unable to read file: {}", file_name),
     };
-
-    println!("1");
 
     file += "\n\0"; // Adding newline and EOF for clarity parsing
 
