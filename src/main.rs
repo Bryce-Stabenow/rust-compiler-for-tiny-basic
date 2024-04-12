@@ -11,11 +11,19 @@ fn main() {
         panic!("Usage: [file_path]");
     }
 
+    parse(args[1].trim_end());
+}
+
+fn parse(file_name: &str) {
+    print!("0");
+
     // Trim newline from input
-    let mut file = match read_to_string(&args[1].trim_end()) {
+    let mut file = match read_to_string(file_name) {
         Ok(f) => f,
-        Err(_) => panic!("Unable to read file: {}", args[1]),
+        Err(_) => panic!("Unable to read file: {}", file_name),
     };
+
+    println!("1");
 
     file += "\n\0"; // Adding newline and EOF for clarity parsing
 
@@ -35,3 +43,18 @@ fn main() {
 }
 
 // struct Emitter {}
+
+#[test]
+fn it_handles_all_test_files() {
+    let test_files: Vec<&str> = vec![
+        "expression.teeny",
+        "hello.teeny",
+        "loop.teeny",
+        "nested-loop.teeny",
+        "test.txt",
+    ];
+
+    for file in test_files {
+        parse(file);
+    }
+}
