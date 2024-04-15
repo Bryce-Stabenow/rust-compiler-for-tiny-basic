@@ -45,22 +45,28 @@ mod tests {
     use super::*;
 
     #[test]
-    fn it_handles_all_test_files() {
-        let test_files: Vec<&str> = vec![
-            "expression.teeny",
-            "hello.teeny",
-            "loop.teeny",
-            "nested-loop.teeny",
-        ];
+    fn it_handles_hello_world() {
+        parse("hello.teeny");
+    }
 
-        for file in test_files {
-            parse(file);
-        }
+    #[test]
+    fn it_handles_expressions() {
+        parse("expression.teeny");
+    }
+
+    #[test]
+    fn it_handles_nested_loops() {
+        parse("nested-loop.teeny");
+    }
+
+    #[test]
+    fn it_handles_loops() {
+        parse("loop.teeny");
     }
 
     #[test]
     #[should_panic]
-    fn it_breaks_on_incorrect_tests() {
+    fn it_breaks_on_incorrect_syntax() {
         parse("test.txt");
     }
 }
