@@ -69,4 +69,10 @@ mod tests {
     fn it_breaks_on_incorrect_syntax() {
         parse("test.txt");
     }
+
+    #[test]
+    #[should_panic]
+    fn it_breaks_on_redeclared_labels() {
+        parse("redeclare.teeny");
+    }
 }

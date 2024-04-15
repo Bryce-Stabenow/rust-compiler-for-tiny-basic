@@ -1,4 +1,4 @@
-use std::process::abort;
+use std::{collections::HashSet, process::abort};
 
 use crate::lex::{Lexer, Token, TokenType};
 
@@ -6,6 +6,9 @@ pub struct Parser {
     pub lex: Lexer,
     pub current_token: Option<Token>,
     pub peek_token: Option<Token>,
+    pub symbols: HashSet<String>,
+    pub declared_labels: HashSet<String>,
+    pub gotoed_labels: HashSet<String>,
 }
 
 #[allow(dead_code)]
@@ -15,6 +18,9 @@ impl Parser {
             lex,
             current_token: None,
             peek_token: None,
+            symbols: HashSet::new(),
+            declared_labels: HashSet::new(),
+            gotoed_labels: HashSet::new(),
         };
 
         // Initialize current_token and peek_token
@@ -80,6 +86,27 @@ impl Parser {
             TokenType::LABEL => {
                 println!("STATEMENT-LABEL");
                 self.next_token();
+
+                let text = self
+                    .current_token
+                    .as_ref()
+                    .unwrap()
+                    .token_text
+                    .as_ref()
+                    .unwrap();
+
+                println!("{}", text);
+
+                if self.declared_labels.contains(text) {
+                    println!("Redeclaration of label: {}", text);
+                    #[cfg(not(test))]
+                    abort();
+
+                    #[cfg(test)] // Panic during testing
+                    panic!();
+                }
+
+                self.declared_labels.insert(text.clone());
                 self.match_token(TokenType::IDENT);
             }
             TokenType::GOTO => {
