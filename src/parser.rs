@@ -281,9 +281,9 @@ impl Parser {
                 .unwrap()
         );
 
-        if self.check_token(TokenType::IDENT) {
+        if self.check_token(TokenType::NUMBER) {
             self.next_token();
-        } else if self.check_token(TokenType::NUMBER) {
+        } else if self.check_token(TokenType::IDENT) {
             let text = self
                 .current_token
                 .as_ref()
