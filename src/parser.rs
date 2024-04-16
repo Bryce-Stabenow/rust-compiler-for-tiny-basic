@@ -55,7 +55,7 @@ impl Parser {
     }
 
     pub fn statement(&mut self) {
-        match self.current_token.as_ref().unwrap().token_type {
+        match self.current_token_type() {
             TokenType::PRINT => {
                 println!("STATEMENT-PRINT");
                 self.next_token();
@@ -98,13 +98,7 @@ impl Parser {
                 println!("STATEMENT-LABEL");
                 self.next_token();
 
-                let text = self
-                    .current_token
-                    .as_ref()
-                    .unwrap()
-                    .token_text
-                    .as_ref()
-                    .unwrap();
+                let text = &self.current_token_text();
 
                 println!("{}", text);
 
@@ -124,14 +118,7 @@ impl Parser {
                 println!("STATEMENT-GOTO");
                 self.next_token();
 
-                let text = self
-                    .current_token
-                    .as_ref()
-                    .unwrap()
-                    .token_text
-                    .as_ref()
-                    .unwrap()
-                    .clone();
+                let text = self.current_token_text();
 
                 self.gotoed_labels.insert(text);
                 self.match_token(TokenType::IDENT);
@@ -140,14 +127,7 @@ impl Parser {
                 println!("STATEMENT-LET");
                 self.next_token();
 
-                let text = self
-                    .current_token
-                    .as_ref()
-                    .unwrap()
-                    .token_text
-                    .as_ref()
-                    .unwrap()
-                    .clone();
+                let text = self.current_token_text();
 
                 if !self.symbols.contains(&text) {
                     self.symbols.insert(text);
@@ -161,14 +141,7 @@ impl Parser {
                 println!("STATEMENT-INPUT");
                 self.next_token();
 
-                let text = self
-                    .current_token
-                    .as_ref()
-                    .unwrap()
-                    .token_text
-                    .as_ref()
-                    .unwrap()
-                    .clone();
+                let text = self.current_token_text();
 
                 if !self.symbols.contains(&text) {
                     self.symbols.insert(text);
@@ -177,15 +150,7 @@ impl Parser {
                 self.match_token(TokenType::IDENT);
             }
             _ => {
-                println!(
-                    "Unexpected expression at {:?}",
-                    self.current_token
-                        .as_ref()
-                        .unwrap()
-                        .token_text
-                        .as_ref()
-                        .unwrap()
-                );
+                println!("Unexpected expression at {:?}", self.current_token_text());
                 #[cfg(not(test))]
                 abort();
 
@@ -271,27 +236,12 @@ impl Parser {
     }
 
     fn primary(&mut self) {
-        println!(
-            "PRIMARY: {:?}",
-            self.current_token
-                .as_ref()
-                .unwrap()
-                .token_text
-                .as_ref()
-                .unwrap()
-        );
+        println!("PRIMARY: {:?}", self.current_token_text());
 
         if self.check_token(TokenType::NUMBER) {
             self.next_token();
         } else if self.check_token(TokenType::IDENT) {
-            let text = self
-                .current_token
-                .as_ref()
-                .unwrap()
-                .token_text
-                .as_ref()
-                .unwrap()
-                .clone();
+            let text = self.current_token_text();
 
             if !self.symbols.contains(&text) {
                 println!("Referencing variable before declaration: {}", text);
@@ -304,16 +254,13 @@ impl Parser {
 
             self.next_token();
         } else {
-            println!(
-                "Unexpected primary token: {:?}",
-                self.current_token.as_ref().unwrap().token_text
-            );
+            println!("Unexpected primary token: {:?}", self.current_token_text());
             abort();
         }
     }
 
     fn check_token(&self, kind: TokenType) -> bool {
-        kind == self.current_token.as_ref().unwrap().token_type
+        kind == self.current_token_type()
     }
 
     fn check_peek(&self, kind: TokenType) -> bool {
@@ -326,12 +273,26 @@ impl Parser {
             println!(
                 "Expected token: {:?}, Got token: {:?}",
                 kind_ref,
-                self.current_token.as_ref().unwrap().token_type
+                self.current_token_type()
             );
             abort();
         }
 
         self.next_token()
+    }
+
+    fn current_token_text(&self) -> String {
+        self.current_token
+            .as_ref()
+            .unwrap()
+            .token_text
+            .as_ref()
+            .unwrap()
+            .clone()
+    }
+
+    fn current_token_type(&self) -> TokenType {
+        self.current_token.as_ref().unwrap().token_type.clone()
     }
 
     fn next_token(&mut self) {
