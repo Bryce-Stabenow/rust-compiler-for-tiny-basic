@@ -41,6 +41,17 @@ impl Parser {
         while self.check_token(TokenType::EOF) == false {
             self.statement();
         }
+
+        for goto in &self.gotoed_labels {
+            if !self.declared_labels.contains(goto) {
+                println!("Goto called on undeclared label: {}", goto);
+                #[cfg(not(test))]
+                abort();
+
+                #[cfg(test)] // Panic during testing
+                panic!();
+            }
+        }
     }
 
     pub fn statement(&mut self) {
@@ -112,11 +123,36 @@ impl Parser {
             TokenType::GOTO => {
                 println!("STATEMENT-GOTO");
                 self.next_token();
+
+                let text = self
+                    .current_token
+                    .as_ref()
+                    .unwrap()
+                    .token_text
+                    .as_ref()
+                    .unwrap()
+                    .clone();
+
+                self.gotoed_labels.insert(text);
                 self.match_token(TokenType::IDENT);
             }
             TokenType::LET => {
                 println!("STATEMENT-LET");
                 self.next_token();
+
+                let text = self
+                    .current_token
+                    .as_ref()
+                    .unwrap()
+                    .token_text
+                    .as_ref()
+                    .unwrap()
+                    .clone();
+
+                if !self.symbols.contains(&text) {
+                    self.symbols.insert(text);
+                }
+
                 self.match_token(TokenType::IDENT);
                 self.match_token(TokenType::EQ);
                 self.expression();
@@ -124,6 +160,20 @@ impl Parser {
             TokenType::INPUT => {
                 println!("STATEMENT-INPUT");
                 self.next_token();
+
+                let text = self
+                    .current_token
+                    .as_ref()
+                    .unwrap()
+                    .token_text
+                    .as_ref()
+                    .unwrap()
+                    .clone();
+
+                if !self.symbols.contains(&text) {
+                    self.symbols.insert(text);
+                }
+
                 self.match_token(TokenType::IDENT);
             }
             _ => {
@@ -234,6 +284,24 @@ impl Parser {
         if self.check_token(TokenType::IDENT) {
             self.next_token();
         } else if self.check_token(TokenType::NUMBER) {
+            let text = self
+                .current_token
+                .as_ref()
+                .unwrap()
+                .token_text
+                .as_ref()
+                .unwrap()
+                .clone();
+
+            if !self.symbols.contains(&text) {
+                println!("Referencing variable before declaration: {}", text);
+                #[cfg(not(test))]
+                abort();
+
+                #[cfg(test)] // Panic during testing
+                panic!();
+            }
+
             self.next_token();
         } else {
             println!(
