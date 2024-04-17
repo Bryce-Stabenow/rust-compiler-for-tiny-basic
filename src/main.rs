@@ -65,6 +65,11 @@ mod tests {
     }
 
     #[test]
+    fn it_handles_complex_programs() {
+        parse("complex.teeny");
+    }
+
+    #[test]
     #[should_panic]
     fn it_breaks_on_incorrect_syntax() {
         parse("test.txt");
