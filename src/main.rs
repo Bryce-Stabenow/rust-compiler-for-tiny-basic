@@ -46,38 +46,38 @@ mod tests {
 
     #[test]
     fn it_handles_hello_world() {
-        parse("hello.teeny");
+        parse("test_files/hello.teeny");
     }
 
     #[test]
     fn it_handles_expressions() {
-        parse("expression.teeny");
+        parse("test_files/expression.teeny");
     }
 
     #[test]
     fn it_handles_nested_loops() {
-        parse("nested-loop.teeny");
+        parse("test_files/nested-loop.teeny");
     }
 
     #[test]
     fn it_handles_loops() {
-        parse("loop.teeny");
+        parse("test_files/loop.teeny");
     }
 
     #[test]
     fn it_handles_complex_programs() {
-        parse("complex.teeny");
+        parse("test_files/complex.teeny");
     }
 
     #[test]
     #[should_panic]
     fn it_breaks_on_incorrect_syntax() {
-        parse("test.txt");
+        parse("test_files/test.txt");
     }
 
     #[test]
     #[should_panic]
     fn it_breaks_on_redeclared_labels() {
-        parse("redeclare.teeny");
+        parse("test_files/redeclare.teeny");
     }
 }
