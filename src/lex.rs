@@ -6,6 +6,14 @@ pub struct Lexer {
 
 #[allow(dead_code)]
 impl Lexer {
+    pub fn new(data: String) -> Self {
+        Lexer {
+            data,
+            current_pos: -1,
+            current_char: None,
+        }
+    }
+
     pub fn next_char(&mut self) {
         self.current_pos += 1;
         self.current_char = self.data.chars().nth(self.current_pos as usize);
