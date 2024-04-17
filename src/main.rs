@@ -1,9 +1,12 @@
+mod emit;
 mod lex;
 mod parser;
 
+use crate::emit::Emitter;
 use crate::lex::Lexer;
 use crate::parser::Parser;
 use std::fs::read_to_string;
+use std::io;
 
 fn main() {
     let args: Vec<String> = std::env::args().collect();
@@ -12,10 +15,13 @@ fn main() {
     }
 
     // Trim newline from input
-    parse(args[1].trim_end());
+    match parse(args[1].trim_end()) {
+        Ok(_) => (),
+        Err(_) => panic!("Unable to parse file"),
+    };
 }
 
-fn parse(file_name: &str) {
+fn parse(file_name: &str) -> io::Result<()> {
     let mut file = match read_to_string(file_name) {
         Ok(f) => f,
         Err(_) => panic!("Unable to read file: {}", file_name),
@@ -23,14 +29,17 @@ fn parse(file_name: &str) {
 
     file += "\n\0"; // Adding newline and EOF for clarity parsing
 
-    // Initialize Lexer and Parser
+    // Initialize Lexer, Parser, and Emitter
     let lex = Lexer::new(file);
+    let emit = Emitter::new(String::from("output/output.c"));
     let mut parser = Parser::new(lex);
 
     // Being parsing
     parser.program();
+    emit.write_file()?;
 
     println!("Parsing complete");
+    Ok(())
 }
 
 // struct Emitter {}
