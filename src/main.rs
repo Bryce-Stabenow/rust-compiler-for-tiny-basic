@@ -42,8 +42,6 @@ fn parse(file_name: &str) -> io::Result<()> {
     Ok(())
 }
 
-// struct Emitter {}
-
 #[cfg(test)]
 mod tests {
     use super::*;
