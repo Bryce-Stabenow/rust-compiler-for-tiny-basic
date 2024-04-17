@@ -10,18 +10,18 @@ use std::io;
 
 fn main() {
     let args: Vec<String> = std::env::args().collect();
-    if args.len() != 2 {
-        panic!("Usage: [file_path]");
+    if args.len() != 3 {
+        panic!("Usage: [file_path] [output_file_name]");
     }
 
     // Trim newline from input
-    match parse(args[1].trim_end()) {
+    match parse(args[1].trim_end(), args[2].trim_end()) {
         Ok(_) => (),
-        Err(_) => panic!("Unable to parse file"),
+        Err(_) => panic!("Unable to output file"),
     };
 }
 
-fn parse(file_name: &str) -> io::Result<()> {
+fn parse(file_name: &str, output_file_name: &str) -> io::Result<()> {
     let mut file = match read_to_string(file_name) {
         Ok(f) => f,
         Err(_) => panic!("Unable to read file: {}", file_name),
@@ -31,7 +31,7 @@ fn parse(file_name: &str) -> io::Result<()> {
 
     // Initialize Lexer, Parser, and Emitter
     let lex = Lexer::new(file);
-    let emit = Emitter::new(String::from("output/output.c"));
+    let emit = Emitter::new(String::from(format!("output/{}.c", output_file_name)));
     let mut parser = Parser::new(lex);
 
     // Being parsing
@@ -48,38 +48,38 @@ mod tests {
 
     #[test]
     fn it_handles_hello_world() {
-        parse("test_files/hello.teeny");
+        assert!(parse("test_files/hello.teeny", "hello").is_ok());
     }
 
     #[test]
     fn it_handles_expressions() {
-        parse("test_files/expression.teeny");
+        assert!(parse("test_files/expression.teeny", "expression").is_ok());
     }
 
     #[test]
     fn it_handles_nested_loops() {
-        parse("test_files/nested-loop.teeny");
+        assert!(parse("test_files/nested-loop.teeny", "nested-loop").is_ok());
     }
 
     #[test]
     fn it_handles_loops() {
-        parse("test_files/loop.teeny");
+        assert!(parse("test_files/loop.teeny", "loop").is_ok());
     }
 
     #[test]
     fn it_handles_complex_programs() {
-        parse("test_files/complex.teeny");
+        assert!(parse("test_files/complex.teeny", "complex").is_ok());
     }
 
     #[test]
     #[should_panic]
     fn it_breaks_on_incorrect_syntax() {
-        parse("test_files/test.txt");
+        assert!(parse("test_files/test.txt", "fail").is_err());
     }
 
     #[test]
     #[should_panic]
     fn it_breaks_on_redeclared_labels() {
-        parse("test_files/redeclare.teeny");
+        assert!(parse("test_files/redeclare.teeny", "fail2").is_err());
     }
 }
