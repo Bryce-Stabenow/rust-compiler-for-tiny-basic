@@ -79,7 +79,6 @@ impl Parser {
                 }
             }
             TokenType::IF => {
-                println!("STATEMENT-IF");
                 self.next_token();
                 self.emit.emit("if(");
                 self.comparison();
@@ -96,7 +95,6 @@ impl Parser {
                 self.emit.emit_line("}");
             }
             TokenType::WHILE => {
-                println!("STATEMENT-WHILE");
                 self.next_token();
                 self.emit.emit("while(");
                 self.comparison();
@@ -113,7 +111,6 @@ impl Parser {
                 self.emit.emit_line("}");
             }
             TokenType::LABEL => {
-                println!("STATEMENT-LABEL");
                 self.next_token();
 
                 let text = &self.current_token_text();
@@ -135,7 +132,6 @@ impl Parser {
                 self.match_token(TokenType::IDENT);
             }
             TokenType::GOTO => {
-                println!("STATEMENT-GOTO");
                 self.next_token();
 
                 let text = self.current_token_text();
@@ -148,7 +144,6 @@ impl Parser {
                 self.match_token(TokenType::IDENT);
             }
             TokenType::LET => {
-                println!("STATEMENT-LET");
                 self.next_token();
 
                 let text = self.current_token_text();
@@ -170,14 +165,23 @@ impl Parser {
                 self.emit.emit_line(";");
             }
             TokenType::INPUT => {
-                println!("STATEMENT-INPUT");
                 self.next_token();
 
                 let text = self.current_token_text();
 
                 if !self.symbols.contains(&text) {
-                    self.symbols.insert(text);
+                    self.symbols.insert(text.clone());
+
+                    let decl = format!("float {};", &text);
+                    self.emit.header_line(&decl);
                 }
+
+                // Handle our input so we can fallback if a user enters an invalid value for input
+                let line = format!("if(0 == scanf(\"%f\", &{})) {{\n{} = 0;", &text, &text);
+                self.emit.emit_line(&line);
+                self.emit.emit("scanf(\"%");
+                self.emit.emit_line("*s\");");
+                self.emit.emit_line("}");
 
                 self.match_token(TokenType::IDENT);
             }
