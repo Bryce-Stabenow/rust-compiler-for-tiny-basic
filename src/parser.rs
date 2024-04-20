@@ -154,7 +154,7 @@ impl Parser {
                     self.emit.header_line(&decl);
                 }
 
-                let asgn = format!("{} =", &text);
+                let asgn = format!("{} = ", &text);
                 self.emit.emit(&asgn);
 
                 self.match_token(TokenType::IDENT);
