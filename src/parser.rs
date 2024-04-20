@@ -199,7 +199,6 @@ impl Parser {
     }
 
     fn nl(&mut self) {
-        println!("NEWLINE");
         self.match_token(TokenType::NEWLINE);
 
         // Allow for multiple new lines in a row (also handles comments)
@@ -209,11 +208,10 @@ impl Parser {
     }
 
     fn comparison(&mut self) {
-        println!("COMPARISON");
-
         self.expression();
 
         if self.is_comparison_operator() {
+            self.emit.emit(&self.current_token_text());
             self.next_token();
             self.expression();
         } else {
@@ -225,6 +223,7 @@ impl Parser {
         }
 
         while self.is_comparison_operator() {
+            self.emit.emit(&self.current_token_text());
             self.next_token();
             self.expression();
         }
@@ -240,31 +239,28 @@ impl Parser {
     }
 
     fn expression(&mut self) {
-        println!("EXPRESSION");
-
         self.term();
 
         while self.check_token(TokenType::PLUS) || self.check_token(TokenType::MINUS) {
+            self.emit.emit(&self.current_token_text());
             self.next_token();
             self.term();
         }
     }
 
     fn term(&mut self) {
-        println!("TERM");
-
         self.urnary();
 
         while self.check_token(TokenType::ASTERISK) || self.check_token(TokenType::SLASH) {
+            self.emit.emit(&self.current_token_text());
             self.next_token();
             self.urnary();
         }
     }
 
     fn urnary(&mut self) {
-        println!("UNARY");
-
         if self.check_token(TokenType::PLUS) || self.check_token(TokenType::MINUS) {
+            self.emit.emit(&self.current_token_text());
             self.next_token();
         }
 
@@ -272,9 +268,8 @@ impl Parser {
     }
 
     fn primary(&mut self) {
-        println!("PRIMARY: {:?}", self.current_token_text());
-
         if self.check_token(TokenType::NUMBER) {
+            self.emit.emit(&self.current_token_text());
             self.next_token();
         } else if self.check_token(TokenType::IDENT) {
             let text = self.current_token_text();
@@ -288,6 +283,7 @@ impl Parser {
                 panic!();
             }
 
+            self.emit.emit(&self.current_token_text());
             self.next_token();
         } else {
             println!("Unexpected primary token: {:?}", self.current_token_text());
