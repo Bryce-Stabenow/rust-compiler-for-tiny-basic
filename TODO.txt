@@ -1,0 +1,14 @@
+Parentheses for expressions
+Logical operators (and, or, not)
+ELSE IF and ELSE
+FOR loop
+Number literals written in binary, hex, and octal
+Allow multiple code files
+Functions with parameters and return values
+Lexical scope (see scope)
+Standard library (e.g., file operations)
+More primitive types (e.g., integer, strings, boolean)
+Arrays
+Record types (i.e., structs or tuples)
+Type checking (see type systems)
+Compiler optimizations (e.g., constant folding)
