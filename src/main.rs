@@ -29,14 +29,15 @@ fn parse(file_name: &str, output_file_name: &str) -> io::Result<()> {
 
     file += "\n\0"; // Adding newline and EOF for clarity parsing
 
-    // Initialize Lexer, Parser, and Emitter
+    // Initialize Lexer, Parser
     let lex = Lexer::new(file);
     let emit = Emitter::new(String::from(format!("output/{}.c", output_file_name)));
-    let mut parser = Parser::new(lex);
 
     // Being parsing
+    let mut parser = Parser::new(lex, emit);
+
     parser.program();
-    emit.write_file()?;
+    parser.emit.write_file()?;
 
     println!("Parsing complete");
     Ok(())

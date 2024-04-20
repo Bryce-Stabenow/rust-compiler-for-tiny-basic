@@ -1,9 +1,11 @@
 use std::{collections::HashSet, process::abort};
 
 use crate::lex::{Lexer, Token, TokenType};
+use crate::Emitter;
 
 pub struct Parser {
     pub lex: Lexer,
+    pub emit: Emitter,
     pub current_token: Option<Token>,
     pub peek_token: Option<Token>,
     pub symbols: HashSet<String>,
@@ -13,9 +15,10 @@ pub struct Parser {
 
 #[allow(dead_code)]
 impl Parser {
-    pub fn new(lex: Lexer) -> Self {
+    pub fn new(lex: Lexer, emit: Emitter) -> Self {
         let mut parser = Parser {
             lex,
+            emit,
             current_token: None,
             peek_token: None,
             symbols: HashSet::new(),
@@ -32,8 +35,6 @@ impl Parser {
     }
 
     pub fn program(&mut self) {
-        println!("PROGRAM");
-
         while self.check_token(TokenType::NEWLINE) {
             self.next_token();
         }
