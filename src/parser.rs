@@ -65,13 +65,16 @@ impl Parser {
     pub fn statement(&mut self) {
         match self.current_token_type() {
             TokenType::PRINT => {
-                println!("STATEMENT-PRINT");
                 self.next_token();
 
                 if self.check_token(TokenType::STRING) {
+                    let line = format!("printf(\" {} \\n\");", &self.current_token_text());
+                    self.emit.emit_line(&line);
                     self.next_token();
                 } else {
+                    self.emit.emit_line("printf(\"%.2f\\n\", (float)(");
                     self.expression();
+                    self.emit.emit_line("));")
                 }
             }
             TokenType::IF => {
