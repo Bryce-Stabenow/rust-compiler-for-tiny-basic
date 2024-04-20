@@ -15,9 +15,9 @@ impl Emitter {
         }
     }
 
-    // pub fn emit(&mut self, code: &str) {
-    //     self.code.push_str(code);
-    // }
+    pub fn emit(&mut self, code: &str) {
+        self.code.push_str(code);
+    }
 
     pub fn emit_line(&mut self, code: &str) {
         self.code.push_str(code);

@@ -1,3 +1,4 @@
+use std::fmt::format;
 use std::{collections::HashSet, process::abort};
 
 use crate::lex::{Lexer, Token, TokenType};
@@ -68,11 +69,11 @@ impl Parser {
                 self.next_token();
 
                 if self.check_token(TokenType::STRING) {
-                    let line = format!("printf(\" {} \\n\");", &self.current_token_text());
+                    let line = format!("printf(\"{}\\n\");", &self.current_token_text());
                     self.emit.emit_line(&line);
                     self.next_token();
                 } else {
-                    self.emit.emit_line("printf(\"%.2f\\n\", (float)(");
+                    self.emit.emit("printf(\"%.2f\\n\", (float)(");
                     self.expression();
                     self.emit.emit_line("));")
                 }
@@ -80,30 +81,36 @@ impl Parser {
             TokenType::IF => {
                 println!("STATEMENT-IF");
                 self.next_token();
+                self.emit.emit("if(");
                 self.comparison();
 
                 self.match_token(TokenType::THEN);
                 self.nl();
+                self.emit.emit_line("){");
 
                 while self.check_token(TokenType::ENDIF) == false {
                     self.statement();
                 }
 
                 self.match_token(TokenType::ENDIF);
+                self.emit.emit_line("}");
             }
             TokenType::WHILE => {
                 println!("STATEMENT-WHILE");
                 self.next_token();
+                self.emit.emit("while(");
                 self.comparison();
 
                 self.match_token(TokenType::REPEAT);
                 self.nl();
+                self.emit.emit_line("){");
 
                 while self.check_token(TokenType::ENDWHILE) == false {
                     self.statement();
                 }
 
                 self.match_token(TokenType::ENDWHILE);
+                self.emit.emit_line("}");
             }
             TokenType::LABEL => {
                 println!("STATEMENT-LABEL");
@@ -123,6 +130,8 @@ impl Parser {
                 }
 
                 self.declared_labels.insert(text.clone());
+                self.emit.emit(text);
+                self.emit.emit_line(":");
                 self.match_token(TokenType::IDENT);
             }
             TokenType::GOTO => {
@@ -131,7 +140,11 @@ impl Parser {
 
                 let text = self.current_token_text();
 
-                self.gotoed_labels.insert(text);
+                self.gotoed_labels.insert(text.clone());
+
+                let line = format!("goto {};", text);
+                self.emit.emit_line(&line);
+
                 self.match_token(TokenType::IDENT);
             }
             TokenType::LET => {
@@ -141,12 +154,20 @@ impl Parser {
                 let text = self.current_token_text();
 
                 if !self.symbols.contains(&text) {
-                    self.symbols.insert(text);
+                    self.symbols.insert(text.clone());
+
+                    let decl = format!("float {};", &text);
+                    self.emit.header_line(&decl);
                 }
+
+                let asgn = format!("{} =", &text);
+                self.emit.emit(&asgn);
 
                 self.match_token(TokenType::IDENT);
                 self.match_token(TokenType::EQ);
+
                 self.expression();
+                self.emit.emit_line(";");
             }
             TokenType::INPUT => {
                 println!("STATEMENT-INPUT");
