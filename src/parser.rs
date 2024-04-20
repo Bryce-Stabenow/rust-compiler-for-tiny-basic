@@ -294,10 +294,6 @@ impl Parser {
         kind == self.current_token_type()
     }
 
-    // fn check_peek(&self, kind: TokenType) -> bool {
-    //     kind == self.peek_token.as_ref().unwrap().token_type
-    // }
-
     fn match_token(&mut self, kind: TokenType) {
         let kind_ref = kind.clone();
         if self.check_token(kind) == false {
