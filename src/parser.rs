@@ -13,7 +13,6 @@ pub struct Parser {
     pub gotoed_labels: HashSet<String>,
 }
 
-#[allow(dead_code)]
 impl Parser {
     pub fn new(lex: Lexer, emit: Emitter) -> Self {
         let mut parser = Parser {
@@ -35,6 +34,10 @@ impl Parser {
     }
 
     pub fn program(&mut self) {
+        // Initial lines for program
+        self.emit.header_line("# include <stdio.h>");
+        self.emit.header_line("int main(void){");
+
         while self.check_token(TokenType::NEWLINE) {
             self.next_token();
         }
@@ -42,6 +45,10 @@ impl Parser {
         while self.check_token(TokenType::EOF) == false {
             self.statement();
         }
+
+        // Close file of C
+        self.emit.emit_line("return 0;");
+        self.emit.emit_line("}");
 
         for goto in &self.gotoed_labels {
             if !self.declared_labels.contains(goto) {
@@ -264,9 +271,9 @@ impl Parser {
         kind == self.current_token_type()
     }
 
-    fn check_peek(&self, kind: TokenType) -> bool {
-        kind == self.peek_token.as_ref().unwrap().token_type
-    }
+    // fn check_peek(&self, kind: TokenType) -> bool {
+    //     kind == self.peek_token.as_ref().unwrap().token_type
+    // }
 
     fn match_token(&mut self, kind: TokenType) {
         let kind_ref = kind.clone();

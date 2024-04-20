@@ -15,9 +15,9 @@ impl Emitter {
         }
     }
 
-    pub fn emit(&mut self, code: &str) {
-        self.code.push_str(code);
-    }
+    // pub fn emit(&mut self, code: &str) {
+    //     self.code.push_str(code);
+    // }
 
     pub fn emit_line(&mut self, code: &str) {
         self.code.push_str(code);
@@ -26,7 +26,7 @@ impl Emitter {
 
     pub fn header_line(&mut self, code: &str) {
         self.header.push_str(code);
-        self.code.push('\n');
+        self.header.push('\n');
     }
 
     pub fn write_file(&self) -> io::Result<()> {

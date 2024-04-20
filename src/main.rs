@@ -7,11 +7,13 @@ use crate::lex::Lexer;
 use crate::parser::Parser;
 use std::fs::read_to_string;
 use std::io;
+use std::process::abort;
 
 fn main() {
     let args: Vec<String> = std::env::args().collect();
     if args.len() != 3 {
-        panic!("Usage: [file_path] [output_file_name]");
+        println!("Usage: [file_path] [output_file_name]");
+        abort();
     }
 
     // Trim newline from input
@@ -27,7 +29,8 @@ fn parse(file_name: &str, output_file_name: &str) -> io::Result<()> {
         Err(_) => panic!("Unable to read file: {}", file_name),
     };
 
-    file += "\n\0"; // Adding newline and EOF for clarity parsing
+    // Adding newline and EOF for clarity parsing
+    file += "\n\0";
 
     // Initialize Lexer, Parser
     let lex = Lexer::new(file);
