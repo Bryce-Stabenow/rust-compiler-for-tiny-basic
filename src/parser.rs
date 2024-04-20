@@ -1,4 +1,3 @@
-use std::fmt::format;
 use std::{collections::HashSet, process::abort};
 
 use crate::lex::{Lexer, Token, TokenType};
